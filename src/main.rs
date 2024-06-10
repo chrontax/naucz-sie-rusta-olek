@@ -9,6 +9,8 @@ use std::fs::File;
 use std::path::Path;
 use csv::Reader;
 use std::{error::Error, io, process};
+use rand_distr::{Normal, Distribution};
+use rand::thread_rng;
 
 
 #[derive(Debug,Clone)]
@@ -41,18 +43,22 @@ impl Matrix {
             data: result_data,
         }
     }
-    pub fn random(rows: usize, cols: usize) -> Matrix {
-        let mut buffer = Vec::<f64>::with_capacity(rows * cols);
+    
+        pub fn random(rows: usize, cols: usize) -> Matrix {
+            let mut buffer = Vec::<f64>::with_capacity(rows * cols);
+            let normal = Normal::new(0.0, 1.0).unwrap(); // mean = 0.0, standard deviation = 1.0
 
-        for _ in 0..rows*cols {
-              let num = rand::thread_rng().gen_range(0.0..1.0);
+            let mut rng = thread_rng();
 
-              buffer.push(num);
+            for _ in 0..rows * cols {
+                let num = normal.sample(&mut rng);
+                buffer.push(num);
+            }
+
+            Matrix { rows, cols, data: buffer }
         }
 
-        Matrix{rows,cols,data:buffer}
 
-    }
 
     pub fn new(rows: usize, cols: usize, data: Vec<f64>) -> Matrix {
 
@@ -384,7 +390,6 @@ fn main() {
     println!("{:?}", network.feed_forward(Matrix::from(vec![5.7,2.9,4.2,1.3])));
     println!("{:?}", network.feed_forward(Matrix::from(vec![5.9,3.0,5.1,1.8])));
 
-    // 5.9,3.0,5.1,1.8
 
     
 
